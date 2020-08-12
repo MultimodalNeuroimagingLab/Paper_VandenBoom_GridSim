@@ -313,10 +313,20 @@ function s1_createHull(bids_rootPath, bids_sub, hemi)
     gROIOuter.tri = gROI.faces;
     gROIOuter = gifti(gROIOuter);
 
-    % 
-    %{
-    giiResultFilepath = [subjData.subjectBaseFolder, hemi, '_', outputPrefix, '_hull.gii'];
-    save(gROIOuter, giiResultFilepath);
-    %}
+    
+    
+    %%
+    %  save the resulting hull
+    %
+    
+    % build and create the output paths
+    bids_outPath     = fullfile(bids_rootPath, 'derivatives', [hemi, '_simulations'], ['sub-' bids_sub]);
+    if ~exist(bids_outPath, 'dir')   
+        mkdir(bids_outPath);    
+    end
+    bids_hullFilepath   = fullfile(bids_outPath, [hemi, '_', outputPrefix, '_hull.gii']);
+
+    % save the hull
+    save(gROIOuter, bids_hullFilepath);
     
 end
