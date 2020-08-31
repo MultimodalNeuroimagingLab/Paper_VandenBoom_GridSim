@@ -10,6 +10,9 @@ bids_sub        = '09';
 bids_task       = 'HandGesture';
 hemi            = 'lh';
 
+% In order to reproduce the results in the article we start at step 2, and
+% set the samples filename to the previously generated sample-set
+samplesFilename = 'sampleSet.mat';
 
 
 
@@ -32,18 +35,17 @@ addpath([gridSimRoot, filesep, 'scripts']);
 %   each participant and manually corrected. The subject's hull that
 %   was used is included with the data on OSF
 
-% step 1 - generate random 3D sample-points on a given hull
+
+% step 1 - Generate random 3D sample-points on a given hull
 % [samplesFilename] = s1_generateSamples(bids_rootPath, bids_sub, hemi);
 %
 % - skip because the sample-points are generated at random, and
-%   the output that is included in the data on OSF is based on a
-%   
-%
-%
-%
+%   the previously generated sample-sets on which the rest of the analysis
+%   build are unique and included in the data on OSF
 
 
-
+% step 2 - Classify the 3D sample-points using a searchlight with a specific radius
 % to be continued...
+
 
 
