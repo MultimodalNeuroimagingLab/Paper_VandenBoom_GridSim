@@ -25,14 +25,24 @@ addpath([gridSimRoot, filesep, 'scripts']);
 %  Execute steps
 %
 
-% step 1 - Create a hull based on freesurfer parcellation areas
-% s1_createHull(bids_rootPath, bids_sub, hemi)
+% step 0 - Create a hull based on freesurfer parcellation areas
+% s0_createHull(bids_rootPath, bids_sub, hemi);
 %
 % - skip because each hull was created with different parameters for
 %   each participant and manually corrected. The subject's hull that
 %   was used is included with the data on OSF
 
-% step 2 - Generate
+% step 1 - generate random 3D sample-points on a given hull
+% [samplesFilename] = s1_generateSamples(bids_rootPath, bids_sub, hemi);
+%
+% - skip because the sample-points are generated at random, and
+%   the output that is included in the data on OSF is based on a
+%   
+%
+%
+%
+
+
 
 % to be continued...
 

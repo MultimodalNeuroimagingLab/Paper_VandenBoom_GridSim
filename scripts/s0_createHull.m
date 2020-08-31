@@ -1,10 +1,10 @@
 %   
-%   Step 1 - create a hull based on freesurfer parcellation areas
-%   s1_createHull(bids_rootPath, bids_sub, hemi)
+%   Step 0 - create a hull based on freesurfer parcellation areas
+%   s0_createHull(bids_rootPath, bids_sub, hemi)
 % 
-%      bids_rootPath    = path to the BIDS root-directory where the data is located
-%      bids_sub         = the subject to create a hull for
-%      hemi             = which hemisphere to simulate on
+%       bids_rootPath    = path to the BIDS root-directory where the data is located
+%       bids_sub         = the subject to create a hull for
+%       hemi             = which hemisphere to simulate on
 %
 %   Copyright (C) 2019 Max van den Boom  (Multimodal Neuroimaging Lab, Mayo Clinic, Rochester MN)
 
@@ -14,7 +14,7 @@
 %   warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 %   You should have received a copy of the GNU General Public License along with this program.  If not, see <https://www.gnu.org/licenses/>.
 %
-function s1_createHull(bids_rootPath, bids_sub, hemi)
+function s0_createHull(bids_rootPath, bids_sub, hemi)
 
     % specify the freesurfer parcallation areas to base the hull on
     outputPrefix    = 'ext';
@@ -320,11 +320,11 @@ function s1_createHull(bids_rootPath, bids_sub, hemi)
     %
     
     % build and create the output paths
-    bids_outPath     = fullfile(bids_rootPath, 'derivatives', [hemi, '_simulations'], ['sub-' bids_sub]);
-    if ~exist(bids_outPath, 'dir')   
-        mkdir(bids_outPath);    
+    bids_simPath     = fullfile(bids_rootPath, 'derivatives', [hemi, '_simulations'], ['sub-' bids_sub]);
+    if ~exist(bids_simPath, 'dir')   
+        mkdir(bids_simPath);    
     end
-    bids_hullFilepath   = fullfile(bids_outPath, [hemi, '_', outputPrefix, '_hull.gii']);
+    bids_hullFilepath   = fullfile(bids_simPath, [hemi, '_', outputPrefix, '_hull.gii']);
 
     % save the hull
     save(gROIOuter, bids_hullFilepath);
