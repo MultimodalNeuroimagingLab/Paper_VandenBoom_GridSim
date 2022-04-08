@@ -1,19 +1,20 @@
 # Functional MRI based simulations of ECoG grid configurations for optimal measurement of spatially distributed hand-gesture information
 Work in Progress
 
-Source-code that belong to article: Van Den Boom, M. A., Miller, K. J., Ramsey, N. F., & Hermes, D. (2021). Functional MRI based simulations of ECoG grid configurations for optimal measurement of spatially distributed hand-gesture information. Journal of neural engineering, 18(2), 026013.
+Source-code that belongs to article: Van Den Boom, M. A., Miller, K. J., Ramsey, N. F., & Hermes, D. (2021). Functional MRI based simulations of ECoG grid configurations for optimal measurement of spatially distributed hand-gesture information. Journal of neural engineering, 18(2), 026013.
 
 Shared datasets can be found on OSF: https://osf.io/z6j3x/.
 
 ## Software requirements
 - Matlab v2019 or higher
-- SPM12 (make sure as path to Matlab and working)
+- SPM12 (make sure added as path to Matlab and working)
 - The code from this github page
+- Example datasets from the article (https://osf.io/z6j3x/) or your own data
 
 ## Data input
 The data is expected to be organized according to the BIDS structure (https://bids-specification.readthedocs.io/).
 The shared data from the article on OSF is structured accordingly.
-To illustrate based on one participants from the open-source data (sub-09), we require:
+To illustrate, based on one participant from the shared data (sub-09), the following files should be present:
 ```
 /BIDS_GridSim/sub-09/func/sub-09_task-HandGesture_bold.nii
 /BIDS_GridSim/sub-09/func/sub-09_task-HandGesture_bold.json
