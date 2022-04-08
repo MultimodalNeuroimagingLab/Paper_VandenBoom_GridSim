@@ -71,12 +71,6 @@ function [samplesFilename] = s1_generateSamples(bids_rootPath, bids_sub, hemi)
     
     % generate a unique samples filename
     samplesFilename = ['sampleSet_', datestr(now,'yyyymmdd_HHMMSS'), '.mat'];
-    
-    % build and create the output paths
-    bids_simPath     = fullfile(bids_rootPath, 'derivatives', [hemi, '_simulations'], ['sub-' bids_sub]);
-    if ~exist(bids_simPath, 'dir')   
-        mkdir(bids_simPath);    
-    end
 
     % save the samples
     outputFilename   = fullfile(bids_simPath, samplesFilename);

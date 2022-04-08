@@ -6,13 +6,13 @@
 %       bids_sub            = the subject to perform the searchlight step on
 %       bids_task           = the task to use for the searchlight classification
 %       hemi                = the hemisphere that this step is applied on
-%       ...
+%       samplesFilename     = the filename of the sample-set of which the sample-points will be used for the searchlight
 %       searchLightRadius   = radius of the searchlight in mm
-%       ....
+%       classConfig         = The classification configuration struct
 %       numThreads          = The number of threads used to classify (0 = set to #cores)
 %
 %   Returns: 
-%       outSamplesFilename  = The filename of the sample-set that includes the classifications
+%       outSamplesFilename  = The filename of the sample-set that includes the searchlight classification results
 %
 %   Copyright (C) 2020 Max van den Boom  (Multimodal Neuroimaging Lab, Mayo Clinic, Rochester MN)
 
@@ -134,7 +134,7 @@ function [outSamplesFilename] = s2_searchlight(bids_rootPath, bids_sub, bids_tas
                     funcXyzData(end - numVoxelsInSlice + size(funcVolData, 1), :)];
 
     % create a box based on the FOV (FOV might not be completely rectangular)
-    [~, fovLineSegMatrix, fovTris] = mx.three_dimensional.rectPointsTo3D(fovCorners);
+    [~, ~, fovTris] = mx.three_dimensional.rectPointsTo3D(fovCorners);
     fovBox = [];
     fovBox.vert = fovCorners;
     fovBox.tri = fovTris;
@@ -336,13 +336,11 @@ function [outSamplesFilename] = s2_searchlight(bids_rootPath, bids_sub, bids_tas
 
     % generate the samples filename
     [~, outFilename, ~] = fileparts(samplesFilename);
-    outSamplesFilename = [outFilename, bids_task, '_searchLight-rad', num2str(searchLightRadius), '.mat'];
+    outSamplesFilename = [outFilename, '_', bids_task, '_searchLight-rad', num2str(searchLightRadius), '.mat'];
     
     % build and create the output paths
-    bids_simPath     = fullfile(bids_rootPath, 'derivatives', [hemi, '_simulations'], ['sub-' bids_sub]);
-    if ~exist(bids_simPath, 'dir'),         mkdir(bids_simPath);    end
     bids_simTaskPath     = fullfile(bids_simPath, bids_task);
-    if ~exist(bids_simTaskPath, 'dir'),     mkdir(bids_simPath);    end
+    if ~exist(bids_simTaskPath, 'dir'),     mkdir(bids_simTaskPath);    end
     
     % save
     outputFilename   = fullfile(bids_simTaskPath, outSamplesFilename);

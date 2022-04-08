@@ -3,10 +3,10 @@
 %
 
 % limit the number of threads to process data (less threads also means less memory)
-numThreads = 1;
+numThreads = 4;
 
 % set the path to the BIDS data directory
-bids_rootPath   = 'Y:\OpenData\BIDS_GridSim';
+bids_rootPath   = '/Users/m218483/Documents/BIDS_GridSim';
 
 % set the subject, task and hemisphere to simulate on
 bids_sub        = '09';
@@ -15,8 +15,8 @@ hemi            = 'lh';
 
 % In order to reproduce the results in the article we start at step 2, and
 % set the samples filename to the previously generated sample-set
-hullFilename = 'lh_ext_hull.gii';               % <--- delete (and perform step 0 below) if working on own dataset
-samplesFilename = 'sampleSet.mat';              % <--- delete (and perform step 1 below) if working on own dataset
+hullFile = 'lh_ext_hull.gii';               % <--- delete (and perform step 0 below) if working on own dataset
+samplesFile = 'sampleSet.mat';              % <--- delete (and perform step 1 below) if working on own dataset
 
 % set the classification configuration
 classConfig = [];
@@ -53,7 +53,7 @@ addpath([gridSimRoot, filesep, 'scripts']);
 %
 
 % step 0 - Create a hull based on freesurfer parcellation areas
-% hullFilename = s0_createHull(bids_rootPath, bids_sub, hemi);
+% hullFile = s0_createHull(bids_rootPath, bids_sub, hemi);
 %
 % - skip because each hull was created with different parameters for
 %   each participant and manually corrected. The subject's hull that
@@ -61,7 +61,7 @@ addpath([gridSimRoot, filesep, 'scripts']);
 
 
 % step 1 - Generate random 3D sample-points on a given hull
-% samplesFilename = s1_generateSamples(bids_rootPath, bids_sub, hemi);
+% samplesFile = s1_generateSamples(bids_rootPath, bids_sub, hemi);
 %
 % - skip because the sample-points are generated at random, and
 %   the previously generated sample-sets on which the rest of the analysis
@@ -69,7 +69,7 @@ addpath([gridSimRoot, filesep, 'scripts']);
 
 
 % step 2 - Peform searchlight classification on each of the 3D sample-points with a specific radius
-s2_searchlight(bids_rootPath, bids_sub, bids_task, hemi, samplesFilename, 7, classConfig, numThreads);
+samplesFile_withSearchlight = s2_searchlight(bids_rootPath, bids_sub, bids_task, hemi, samplesFile, 7, classConfig, numThreads);
 
 %... more
 
