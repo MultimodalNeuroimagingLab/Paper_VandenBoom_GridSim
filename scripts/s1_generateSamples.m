@@ -4,7 +4,7 @@
 % 
 %       bids_rootPath    = path to the BIDS root-directory where the data is located
 %       bids_sub         = the subject to create a hull for
-%       hemi             = which hemisphere to simulate on
+%       hemi             = the hemisphere that this step is applied on
 %
 %   Returns: 
 %       samplesFilename  = The filename of the sample-set that was generated and stored
@@ -42,7 +42,7 @@ function [samplesFilename] = s1_generateSamples(bids_rootPath, bids_sub, hemi)
 	% read the hull
 	gHull = gifti(fullfile(bids_simPath, [hemi, '_ext_hull.gii']));
 
-    
+
 
 	%%
 	%  Generate samples
@@ -77,9 +77,9 @@ function [samplesFilename] = s1_generateSamples(bids_rootPath, bids_sub, hemi)
     if ~exist(bids_simPath, 'dir')   
         mkdir(bids_simPath);    
     end
-    bids_samplesFilepath   = fullfile(bids_simPath, samplesFilename);
 
-    % save the hull
-    save(bids_samplesFilepath, 'SS');
+    % save the samples
+    outputFilename   = fullfile(bids_simPath, samplesFilename);
+    save(outputFilename, 'SS');
     
 end
