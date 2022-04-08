@@ -2,6 +2,7 @@
 Work in Progress
 
 Source-code that belong to article: Van Den Boom, M. A., Miller, K. J., Ramsey, N. F., & Hermes, D. (2021). Functional MRI based simulations of ECoG grid configurations for optimal measurement of spatially distributed hand-gesture information. Journal of neural engineering, 18(2), 026013.
+
 Shared datasets can be found on OSF: https://osf.io/z6j3x/.
 
 ## Software requirements
