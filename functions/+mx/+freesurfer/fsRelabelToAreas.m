@@ -31,7 +31,7 @@
 function reAnnotVertexLabels = fsRelabelToAreas(fsAreas, annotColortable, annotVertexLabels)
     
     % find the color codes for the required annotation areas
-    areaColorCodes = fsRetrieveColorCodes(fsAreas, annotColortable);
+    areaColorCodes = mx.freesurfer.fsRetrieveColorCodes(fsAreas, annotColortable);
 
     % create a copy of the input list
     reAnnotVertexLabels = annotVertexLabels;

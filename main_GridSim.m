@@ -6,7 +6,7 @@
 numThreads = 4;
 
 % set the path to the BIDS data directory
-bids_rootPath   = '/Users/m218483/Documents/BIDS_GridSim';
+bids_rootPath   = 'Y:\WorkData\BIDS_GridSim';
 
 % set the subject, task and hemisphere to simulate on
 bids_sub        = '09';
@@ -45,6 +45,7 @@ classConfig.classificationMethod = 'svm';
 %
 gridSimRoot = gridSimRootPath;
 addpath([gridSimRoot, filesep, 'scripts']);
+addpath([gridSimRoot, filesep, 'functions']);
 
 
 

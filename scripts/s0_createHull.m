@@ -66,7 +66,7 @@ function [hullFilename] = s0_createHull(bids_rootPath, bids_sub, hemi)
     %
 
     % relabel the vertex annotation (color) labels to the ROI area indices
-    roiVertexLabels = fsRelabelToAreas(fsROIAreas, annotColortable, annotVertexLabels);
+    roiVertexLabels = mx.freesurfer.fsRelabelToAreas(fsROIAreas, annotColortable, annotVertexLabels);
 
     % fuse the labels to make them dichotome (0 not in ROI, 1 if it is)
     % 
@@ -87,7 +87,7 @@ function [hullFilename] = s0_createHull(bids_rootPath, bids_sub, hemi)
     extractRoiFaceIndices = find(roiFacesLabels == 1);
 
     % recreate a gifti with only the faces and vertices of the ROI
-    [vertexMatrix, facesMatrix, vertexConversion] = extract3DFaces(gSurfPial, extractRoiFaceIndices);
+    [vertexMatrix, facesMatrix, vertexConversion] = mx.three_dimensional.extract3DFaces(gSurfPial, extractRoiFaceIndices);
     gROISurfPial = gSurfPial;
     gROISurfPial.vertices = vertexMatrix;
     gROISurfPial.faces = facesMatrix;
