@@ -3,7 +3,7 @@
 %
 
 % limit the number of threads to process data (less threads also means less memory)
-numThreads = 4;
+numThreads = 1;
 
 % set the path to the BIDS data directory
 bids_rootPath   = 'Y:\WorkData\BIDS_GridSim';

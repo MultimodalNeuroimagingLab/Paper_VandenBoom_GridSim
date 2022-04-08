@@ -215,7 +215,7 @@ function [hullFilename] = s0_createHull(bids_rootPath, bids_sub, hemi)
 
     % create a seperate ROI gifti
     clear gROI;
-    [gROI.vert, gROI.tri, ~] = extract3DFaces(highHullCortex, hullROIFaceIndices);
+    [gROI.vert, gROI.tri, ~] = mx.three_dimensional.extract3DFaces(highHullCortex, hullROIFaceIndices);
     gROI = gifti(gROI);
 
 

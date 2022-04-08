@@ -52,7 +52,7 @@ function [samplesFilename] = s1_generateSamples(bids_rootPath, bids_sub, hemi)
 	SS = [];
 
 	% generate random 3D sample points on a given 3D object
-	[SS.samplePositions, SS.sampleTriangles] = genRandomSamplePoints3DObject(gHull, numSamples);
+	[SS.samplePositions, SS.sampleTriangles] = mx.three_dimensional.genRandomSamplePoints3DObject(gHull, numSamples);
     
     
     
