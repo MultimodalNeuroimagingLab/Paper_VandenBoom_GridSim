@@ -1,10 +1,12 @@
 %   
 %   Step 0 - create a hull based on freesurfer parcellation areas
-%   s0_createHull(bids_rootPath, bids_sub, hemi)
+%   gOut = s0_createHull(bids_rootPath, bids_sub, hemi, fs_parcAnnotFile, fs_ROIAreas)
 % 
 %       bids_rootPath    = path to the BIDS root-directory where the data is located
 %       bids_sub         = the subject to create a hull for
 %       hemi             = the hemisphere that this step is applied on
+%       fs_parcAnnotFile = the freesurfer parcelation annotion file
+%       fs_ROIAreas       = The freesurfer parcelation areas that we want to create a hull for
 %
 %
 %   Returns: 
@@ -18,13 +20,8 @@
 %   warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 %   You should have received a copy of the GNU General Public License along with this program.  If not, see <https://www.gnu.org/licenses/>.
 %
-function [hullFilename] = s0_createHull(bids_rootPath, bids_sub, hemi)
+function gOut = s0_createHull(bids_rootPath, bids_sub, hemi, fs_parcAnnotFile, fs_ROIAreas)
 
-    % specify the freesurfer parcallation areas to base the hull on
-    outputPrefix    = 'ext';
-    fsROIAreas 	    = { 'superiorfrontal', 'caudalmiddlefrontal', 'parsopercularis', ...
-                        'precentral', 'postcentral', 'superiorparietal', ...
-                        'supramarginal', 'inferiorparietal'  };
     %outputPrefix    = 'sensorymotor';
     %fsROIAreas      = { 'precentral', 'postcentral'};
 
@@ -52,7 +49,7 @@ function [hullFilename] = s0_createHull(bids_rootPath, bids_sub, hemi)
     % build the paths to the data
     bids_fsPath     = fullfile(bids_rootPath, 'derivatives', 'freesurfer', ['sub-' bids_sub]);
     bids_pialPath   = fullfile(bids_fsPath, 'surf', [hemi, '.pial.gii']);
-    bids_annotPath  = fullfile(bids_fsPath, 'label', [hemi, '.aparc.Ext.annot']);
+    bids_annotPath  = fullfile(bids_fsPath, 'label', fs_parcAnnotFile);
 
     % read the surface files (pial)
     gSurfPial = gifti(bids_pialPath);
@@ -67,7 +64,7 @@ function [hullFilename] = s0_createHull(bids_rootPath, bids_sub, hemi)
     %
 
     % relabel the vertex annotation (color) labels to the ROI area indices
-    roiVertexLabels = mx.freesurfer.fsRelabelToAreas(fsROIAreas, annotColortable, annotVertexLabels);
+    roiVertexLabels = mx.freesurfer.fsRelabelToAreas(fs_ROIAreas, annotColortable, annotVertexLabels);
 
     % fuse the labels to make them dichotome (0 not in ROI, 1 if it is)
     % 
@@ -311,29 +308,11 @@ function [hullFilename] = s0_createHull(bids_rootPath, bids_sub, hemi)
     end     % end of inner hull vertex loop
 
 
-    % create a new outer ROI gifti
-    clear gROIOuter;
-    gROIOuter.vert = projectedVertices;
-    gROIOuter.tri = gROI.faces;
-    gROIOuter = gifti(gROIOuter);
+    % create and return a new ROI gifti
+    gOut = struct();
+    gOut.vert = projectedVertices;
+    gOut.tri = gROI.faces;
+    gOut = gifti(gOut);
 
-    
-    
-    %%
-    %  save the resulting hull
-    %
-
-    % generate a hull filename
-    hullFilename = [hemi, '_', outputPrefix, '_hull.gii'];
-    
-    % build and create the output paths
-    bids_simPath     = fullfile(bids_rootPath, 'derivatives', [hemi, '_simulations'], ['sub-' bids_sub]);
-    if ~exist(bids_simPath, 'dir')   
-        mkdir(bids_simPath);    
-    end
-
-    % save the hull
-    outputFilename   = fullfile(bids_simPath, hullFilename);
-    save(gROIOuter, outputFilename);
     
 end

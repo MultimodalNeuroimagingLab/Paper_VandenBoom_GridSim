@@ -56,13 +56,23 @@ addpath([gridSimRoot, filesep, 'functions']);
 %%
 % Step 0 - Create a hull based on freesurfer parcellation areas
 %
+%{
 
-% hullFile = s0_createHull(bids_rootPath, bids_sub, hemi);
 %
 % - skip because each hull was created with different parameters for
 %   each participant and manually corrected. The subject's hull that
 %   was used is included with the data on OSF
 
+%gHull = s0_createHull(  bids_rootPath, bids_sub, hemi, [hemi, '.aparc.annot'], { 'precentral', 'postcentral' });
+gHull = s0_createHull(  bids_rootPath, bids_sub, hemi, [hemi, '.aparc.Ext.annot'], ...
+                        { 'superiorfrontal', 'caudalmiddlefrontal', 'parsopercularis', 'precentral', ...
+                          'postcentral', 'superiorparietal', 'supramarginal', 'inferiorparietal'  });
+
+% save
+hullFile = [hemi, '_ext_hull__.gii'];
+save(gHull, fullfile(bids_simPath, hullFile))
+                          
+%}
 
 
 %% 
