@@ -124,10 +124,10 @@ save(fullfile(samplesFile_s3_out, [samplesFile_s2_out, '_', suffix, '.mat']), 'S
 %%
 %  Step 4 - Project all virtual grid-configurations on a hull using the 3D sample-points as the center, with their random rotations
 %
-samplesFile_s4_out =     fullfile(samplesFile_s3_out, [samplesFile_s2_out, '_', suffix, '_proj']);
+samplesProjDir_s4_out =     fullfile(samplesFile_s3_out, [samplesFile_s2_out, '_', suffix, '_proj']);
 hullPath = fullfile(bids_simPath, [hemi, '_ext_hull.gii']);
 
-s4_projectGrids(SS, hullPath, samplesFile_s4_out)
+s4_projectGrids(SS, hullPath, samplesProjDir_s4_out)
 
 
 
