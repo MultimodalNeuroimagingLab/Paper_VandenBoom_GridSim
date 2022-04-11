@@ -6,6 +6,7 @@
 %       bids_sub         = the subject to create a hull for
 %       hemi             = the hemisphere that this step is applied on
 %
+%
 %   Returns: 
 %       hullFilename     = The filename of the hull that was generated and stored
 %

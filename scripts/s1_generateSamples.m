@@ -1,13 +1,13 @@
 %   
 %   Step 1 - generate random 3D sample-points on a given hull
-%   [samplesFilename] = s1_generateSamples(bids_rootPath, bids_sub, hemi)
+%   [SS, filenameSuffix] = s1_generateSamples(bids_rootPath)
 % 
-%       bids_rootPath    = path to the BIDS root-directory where the data is located
-%       bids_sub         = the subject to create a hull for
-%       hemi             = the hemisphere that this step is applied on
+%       hullPath         = path to the hull gifti file, this is where the 3D sample point will be generated on top of
+%
 %
 %   Returns: 
-%       samplesFilename  = The filename of the sample-set that was generated and stored
+%       SS               = A structure that holds the sample-points
+%       filenameSuffix   = A suggestion for a filename suffix (effectively the date/time in the format: yyyymmdd_HHMMSS)
 %
 %   Copyright (C) 2019 Max van den Boom  (Multimodal Neuroimaging Lab, Mayo Clinic, Rochester MN)
 
@@ -17,7 +17,7 @@
 %   warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 %   You should have received a copy of the GNU General Public License along with this program.  If not, see <https://www.gnu.org/licenses/>.
 %
-function [samplesFilename] = s1_generateSamples(bids_rootPath, bids_sub, hemi)
+function [SS, filenameSuffix] = s1_generateSamples(hullPath)
 
 	numSamples = 1000000;
 
@@ -33,14 +33,9 @@ function [samplesFilename] = s1_generateSamples(bids_rootPath, bids_sub, hemi)
     
 
     %%
-    %  Build paths and read the files
+    %  Read the hull
     %
-    
-    % build the paths to the data
-    bids_simPath     = fullfile(bids_rootPath, 'derivatives', [hemi, '_simulations'], ['sub-' bids_sub]);
-
-	% read the hull
-	gHull = gifti(fullfile(bids_simPath, [hemi, '_ext_hull.gii']));
+	gHull = gifti(hullPath);
 
 
 
@@ -62,18 +57,10 @@ function [samplesFilename] = s1_generateSamples(bids_rootPath, bids_sub, hemi)
 
 	% generate a sample-list of grid rotations
 	SS.sampleGridRotations = rand(size(SS.samplePositions, 1), 1) * 180;
-
     
     
     %%
-    %  save the samples
-    %
-    
-    % generate a unique samples filename
-    samplesFilename = ['sampleSet_', datestr(now,'yyyymmdd_HHMMSS'), '.mat'];
-
-    % save the samples
-    outputFilename   = fullfile(bids_simPath, samplesFilename);
-    save(outputFilename, 'SS');
+    % generate and return a file suffix
+    filenameSuffix = [datestr(now,'yyyymmdd'), 'T', datestr(now,'HHMMSS')];
     
 end

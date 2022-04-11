@@ -13,10 +13,15 @@ bids_sub        = '09';
 bids_task       = 'HandGesture';
 hemi            = 'lh';
 
+% output path for the simulations
+bids_simPath = fullfile(bids_rootPath, 'derivatives', [hemi, '_simulations'], ['sub-' bids_sub]);
+if ~exist(bids_simPath, 'dir'),     mkdir(bids_simPath);    end
+
 % In order to reproduce the results in the article we start at step 2, and
 % set the samples filename to the previously generated sample-set
-hullFile = 'lh_ext_hull.gii';               % <--- delete (and perform step 0 below) if working on own dataset
-samplesFile = 'sampleSet.mat';              % <--- delete (and perform step 1 below) if working on own dataset
+hullFile = 'lh_ext_hull.gii';                                   % <--- delete (and perform step 0 below) if working on own dataset
+samplesFile_s1_out = 'sampleSet';                               % <--- delete (and perform step 1 below) if working on own dataset
+load(fullfile(bids_simPath, [samplesFile_s1_out, '.mat']));     % <--- delete (and perform step 1 below) if working on own dataset
 
 % set the classification configuration
 classConfig = [];
@@ -39,7 +44,6 @@ classConfig.classificationMethod = 'svm';
 
 
 
-
 %%
 % retrieve the root path and make sure dependencies can be found
 %
@@ -50,10 +54,9 @@ addpath([gridSimRoot, filesep, 'functions']);
 
 
 %%
-%  Execute steps
+% Step 0 - Create a hull based on freesurfer parcellation areas
 %
 
-% step 0 - Create a hull based on freesurfer parcellation areas
 % hullFile = s0_createHull(bids_rootPath, bids_sub, hemi);
 %
 % - skip because each hull was created with different parameters for
@@ -61,16 +64,62 @@ addpath([gridSimRoot, filesep, 'functions']);
 %   was used is included with the data on OSF
 
 
-% step 1 - Generate random 3D sample-points on a given hull
-% samplesFile = s1_generateSamples(bids_rootPath, bids_sub, hemi);
+
+%% 
+%  Step 1 - Generate random 3D sample-points on a given hull
 %
-% - skip because the sample-points are generated at random, and
-%   the previously generated sample-sets on which the rest of the analysis
-%   build are unique and included in the data on OSF
+%{
+
+% - skip because the sample-points are generated at random, and to reproduce the
+%   output for this subject we need to use exactly the same input data, which
+%   are the previously generated sample-sets, included in the data on OSF
+
+hullPath = fullfile(bids_simPath, [hemi, '_ext_hull.gii']);
+[SS, suffix] = s1_generateSamples(hullPath);
+
+samplesFile_s1_out = ['sampleSet-', suffix];
+save(fullfile(bids_simTaskPath, [samplesFile_s1_out, '.mat']), 'SS');
+
+%}
 
 
-% step 2 - Peform searchlight classification on each of the 3D sample-points with a specific radius
-samplesFile_withSearchlight = s2_searchlight(bids_rootPath, bids_sub, bids_task, hemi, samplesFile, 7, classConfig, numThreads);
+
+%%
+%  Step 2 - Peform searchlight classification on each of the 3D sample-points with a specific radius
+%
+[SS, suffix] = s2_searchlight(  SS, bids_rootPath, bids_sub, bids_task, hemi, ...
+                                7, ...                                              % <-- searchlight radius
+                                classConfig, numThreads);
+
+% save results
+bids_simTaskPath     = fullfile(bids_simPath, bids_task);
+if ~exist(bids_simTaskPath, 'dir'),     mkdir(bids_simTaskPath);    end
+samplesFile_s2_out = [samplesFile_s1_out, '_', bids_task, '_', suffix];
+save(fullfile(bids_simTaskPath, [samplesFile_s2_out, '.mat']), 'SS');
+
+    
+
+%%
+%  Step 3 - Select the 3D sample-points with a searchlight classification score above a given threshold
+%
+[SS, suffix] = s3_sampleSelection(SS);
+
+% save
+samplesFile_s3_out =     fullfile(bids_simTaskPath, [samplesFile_s2_out, '_', suffix]);
+if ~exist(samplesFile_s3_out, 'dir'),     mkdir(samplesFile_s3_out);    end
+save(fullfile(samplesFile_s3_out, [samplesFile_s2_out, '_', suffix, '.mat']), 'SS');
+
+
+
+%%
+%  Step 4 - Project all virtual grid-configurations on a hull using the 3D sample-points as the center, with their random rotations
+%
+samplesFile_s4_out =     fullfile(samplesFile_s3_out, [samplesFile_s2_out, '_', suffix, '_proj']);
+hullPath = fullfile(bids_simPath, [hemi, '_ext_hull.gii']);
+
+s4_projectGrids(SS, hullPath, samplesFile_s4_out)
+
+
 
 %... more
 

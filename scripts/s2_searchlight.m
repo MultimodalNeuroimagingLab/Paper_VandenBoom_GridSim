@@ -1,20 +1,25 @@
 %   
-%   Step 2 - Peform searchlight classification on each of the 3D sample-points with a specific radius
-%   [outSamplesFilename] = s2_searchlight(bids_rootPath, bids_sub, bids_task, hemi, samplesFilename, searchLightRadius, classConfig, numThreads))
+%   Step 2 - Perform searchlight classification on each of the 3D sample-points with a specific radius
+%            Sample-points outside of the FOV of the task are removed beforehand
+%
+%   [SS, filenameSuffix] = s2_searchlight(SS, bids_rootPath, bids_sub, bids_task, hemi, searchLightRadius, classConfig, numThreads)
 % 
+%       SS                  = Structure that holds the sample-points to apply the searchlight classifications on
 %       bids_rootPath       = path to the BIDS root-directory where the data is located
 %       bids_sub            = the subject to perform the searchlight step on
 %       bids_task           = the task to use for the searchlight classification
 %       hemi                = the hemisphere that this step is applied on
-%       samplesFilename     = the filename of the sample-set of which the sample-points will be used for the searchlight
 %       searchLightRadius   = radius of the searchlight in mm
 %       classConfig         = The classification configuration struct
-%       numThreads          = The number of threads used to classify (0 = set to #cores)
+%       numThreads          = The number of threads used to classifys (0 = set to #cores)
+%
 %
 %   Returns: 
-%       outSamplesFilename  = The filename of the sample-set that includes the searchlight classification results
+%       SS                  = The input structure with the searchlight classifications results added
+%       filenameSuffix      = Depending on the searchlight radius, a suggestion for a filename suffix
 %
-%   Copyright (C) 2020 Max van den Boom  (Multimodal Neuroimaging Lab, Mayo Clinic, Rochester MN)
+%
+%   Copyright 2020, Max van den Boom (Multimodal Neuroimaging Lab, Mayo Clinic, Rochester MN)
 
 %   This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License
 %   as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
@@ -22,10 +27,11 @@
 %   warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 %   You should have received a copy of the GNU General Public License along with this program.  If not, see <https://www.gnu.org/licenses/>.
 %
-function [outSamplesFilename] = s2_searchlight(bids_rootPath, bids_sub, bids_task, hemi, samplesFilename, searchLightRadius, classConfig, numThreads)
+function [SS, filenameSuffix] = s2_searchlight(SS, bids_rootPath, bids_sub, bids_task, hemi, searchLightRadius, classConfig, numThreads)
     if exist('numThreads', 'var') == 0,  numThreads = 0;     end
     
-    searchlightLimit = 200000;              % limit on the number of searchlights
+    searchlightLimit = 20;              % limit on the number of searchlights
+    %searchlightLimit = 200000;              % limit on the number of searchlights
 
     %%
     % retrieve the root path and make sure dependencies can be found
@@ -49,9 +55,6 @@ function [outSamplesFilename] = s2_searchlight(bids_rootPath, bids_sub, bids_tas
     bids_func_eventFilepath = fullfile(bids_rootPath, ['sub-' bids_sub], 'func', ['sub-' bids_sub '_task-' bids_task '_events.tsv']);
     bids_func_dataFilepath = fullfile(bids_rootPath, ['sub-' bids_sub], 'func', ['sub-' bids_sub '_task-' bids_task '_bold.nii']);
     bids_func_jsonFilepath = fullfile(bids_rootPath, ['sub-' bids_sub], 'func', ['sub-' bids_sub '_task-' bids_task '_bold.json']);
-
-    % load the sample-set file
-    load(fullfile(bids_simPath, samplesFilename));
 
     % load the grey matter volume (reslices to functional, native space)
     gmData = mx.nifti.readVol(bids_gmFilepath);
@@ -329,21 +332,7 @@ function [outSamplesFilename] = s2_searchlight(bids_rootPath, bids_sub, bids_tas
 
     end
 
-
-    %%
-    %  Save the result
-    %
-
-    % generate the samples filename
-    [~, outFilename, ~] = fileparts(samplesFilename);
-    outSamplesFilename = [outFilename, '_', bids_task, '_searchLight-rad', num2str(searchLightRadius), '.mat'];
+    % return a file suffix
+    filenameSuffix = ['search-rad', num2str(searchLightRadius)];
     
-    % build and create the output paths
-    bids_simTaskPath     = fullfile(bids_simPath, bids_task);
-    if ~exist(bids_simTaskPath, 'dir'),     mkdir(bids_simTaskPath);    end
-    
-    % save
-    outputFilename   = fullfile(bids_simTaskPath, outSamplesFilename);
-    save(outputFilename, 'SS');
-
 end
