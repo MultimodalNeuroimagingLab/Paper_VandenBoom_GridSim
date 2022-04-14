@@ -2,11 +2,15 @@
 %   Step 4 - Project virtual grids on a hull using the 3D sample-points as the center, with their random rotations and the given
 %            grid configurations. Output files will be written in the provided path.
 %
-%   s4_projectGrids(SS, hullPath, projectionsOutputDir)
+%   outputFiles = s4_projectGrids(SS, hullPath, projectionsOutputDir)
 % 
 %       SS                          = Structure that holds the sample-points to project the different grid-configurations on
 %       hullPath                    = path to the hull gifti file, this is where the grids will be projected on
 %       projectionsOutputDir        = path a folder to output the files to
+%
+%
+%   Returns: 
+%       outputFiles                 = A cell array containing the paths to all grid-configurations output files
 %
 %
 %   Copyright 2020, Max van den Boom (Multimodal Neuroimaging Lab, Mayo Clinic, Rochester MN)
@@ -17,7 +21,7 @@
 %   warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 %   You should have received a copy of the GNU General Public License along with this program.  If not, see <https://www.gnu.org/licenses/>.
 %
-function s4_projectGrids(SS, hullPath, projectionsOutputDir)
+function outputFiles = s4_projectGrids(SS, hullPath, projectionsOutputDir)
 
 
     % define the grid configuration to loop through
@@ -93,15 +97,19 @@ function s4_projectGrids(SS, hullPath, projectionsOutputDir)
     % create an copy of the original input sample-set
     origSS = SS;
 
-    %%%
-    %% project the grid for each grid configuration on the sample-set points
-    %%%
+    
+    %%
+    % project the grid for each grid configuration on the sample-set points
+    %
 
+    %
+    outputFiles = {};
+    
     % loop through the different grid configurations
     for iGridConf = 1:size(gridConfigurations, 1)
 
         % create a clear workspace, while keeping essential input variables
-        clearvars -except iGridConf gridConfigurations origSS bids_simTaskSelectionDir gHull;
+        clearvars -except iGridConf gridConfigurations origSS bids_simTaskSelectionDir gHull projectionsOutputDir outputFiles;
 
         % reset the sample-set to the original input
         SS = origSS;
@@ -388,10 +396,14 @@ function s4_projectGrids(SS, hullPath, projectionsOutputDir)
         % display elapsed time for projection
         disp(['Time elapsed on projection of samples: ', num2str(toc(projGridTic))]);
         
-        % save the sampleset
+        % save the grid-configuration sampleset
         saveFolder =    fullfile(projectionsOutputDir, ['n', num2str(SS.gridConfig.elecTotal)]);
         if ~exist(saveFolder, 'dir'),   mkdir(saveFolder);  end
-        save(fullfile(saveFolder, ['projections_n', num2str(SS.gridConfig.elecTotal), '_sp', num2str(SS.gridConfig.elecHorzSpacing), '_ra', num2str(SS.gridConfig.elecSizeRadius), '.mat']), 'SS');
+        outFilename = ['projections_n', num2str(SS.gridConfig.elecTotal), '_sp', num2str(SS.gridConfig.elecHorzSpacing), '_ra', num2str(SS.gridConfig.elecSizeRadius), '.mat'];
+        save(fullfile(saveFolder, outFilename), 'SS');
+        
+        % store the path to the grid-configuration sampleset
+        outputFiles{end + 1} = fullfile(saveFolder, outFilename);
         
     end     % end grid configuration loop
 

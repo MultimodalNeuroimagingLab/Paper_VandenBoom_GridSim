@@ -75,6 +75,7 @@ save(gHull, fullfile(bids_simPath, hullFile))
 %}
 
 
+
 %% 
 %  Step 1 - Generate random 3D sample-points on a given hull
 %
@@ -97,37 +98,39 @@ save(fullfile(bids_simTaskPath, [samplesFile_s1_out, '.mat']), 'SS');
 %%
 %  Step 2 - Peform searchlight classification on each of the 3D sample-points with a specific radius
 %
-[SS, suffix] = s2_searchlight(  SS, bids_rootPath, bids_sub, bids_task, hemi, ...
-                                7, ...                                              % <-- searchlight radius
-                                classConfig, numThreads);
+[SS, suffix]                = s2_searchlight(   SS, bids_rootPath, bids_sub, bids_task, hemi, ...
+                                                7, ...                                                      % <-- searchlight radius
+                                                classConfig, numThreads);
 
 % save results
-bids_simTaskPath     = fullfile(bids_simPath, bids_task);
+bids_simTaskPath            = fullfile(bids_simPath, bids_task);
 if ~exist(bids_simTaskPath, 'dir'),     mkdir(bids_simTaskPath);    end
-samplesFile_s2_out = [samplesFile_s1_out, '_', bids_task, '_', suffix];
+samplesFile_s2_out          = [samplesFile_s1_out, '_', bids_task, '_', suffix];
 save(fullfile(bids_simTaskPath, [samplesFile_s2_out, '.mat']), 'SS');
+%samplesFile_s2_out         = 'sampleSet_HandGesture_search-rad7';                                          % <-- for debugging or to pick up after this step (make sure to load the file first)
 
-    
+
 
 %%
 %  Step 3 - Select the 3D sample-points with a searchlight classification score above a given threshold
 %
-[SS, suffix] = s3_sampleSelection(SS);
+[SS, suffix]                = s3_sampleSelection(SS);
 
-% save
-samplesFile_s3_out =     fullfile(bids_simTaskPath, [samplesFile_s2_out, '_', suffix]);
+% save results
+bids_simTaskPath            = fullfile(bids_simPath, bids_task);
+samplesFile_s3_out          = fullfile(bids_simTaskPath, [samplesFile_s2_out, '_', suffix]);
 if ~exist(samplesFile_s3_out, 'dir'),     mkdir(samplesFile_s3_out);    end
 save(fullfile(samplesFile_s3_out, [samplesFile_s2_out, '_', suffix, '.mat']), 'SS');
+%samplesFile_s3_out         = fullfile(bids_simTaskPath, 'sampleSet_HandGesture_search-rad7_P95nofoc');      % <-- for debugging or to pick up after this step (make sure to load the file first)
 
 
 
 %%
 %  Step 4 - Project all virtual grid-configurations on a hull using the 3D sample-points as the center, with their random rotations
 %
-samplesProjDir_s4_out =     fullfile(samplesFile_s3_out, [samplesFile_s2_out, '_', suffix, '_proj']);
-hullPath = fullfile(bids_simPath, [hemi, '_ext_hull.gii']);
-
-s4_projectGrids(SS, hullPath, samplesProjDir_s4_out)
+samplesFiles_s4_out         = s4_projectGrids(  SS, ...
+                                                fullfile(bids_simPath, [hemi, '_ext_hull.gii']), ...
+                                                fullfile(samplesFile_s3_out, [samplesFile_s2_out, '_', suffix, '_proj']));
 
 
 
