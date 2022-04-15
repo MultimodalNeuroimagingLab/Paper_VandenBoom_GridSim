@@ -1,15 +1,14 @@
 %
-%   Retrieve outer bounds from a 3D object
-%   [metrics] = getOuterBounds(input, ...)
-%   [metrics] = getOuterBounds(vertices, faces, ...)
+%   Generate random sample points on a given 3D object
+%   [samplePoints, sampleTriangles] = genRandomSamplePoints3DObject(obj3D, numSamples)
 %
-%   	input         = the input 3D to extract the outer bounds from
+%       obj3D           = the 3D object onto which the vertices are projected
+%       numSamples      = the number of 3D sample pont to be generated
 %
 %
 %   Returns: 
-%       edges         = vector with the edges that define the outer bounds
-%       vertexIndices = vector with the indices of the vertices that define
-%                       the outer bounds
+%       samplePoints    = The random 3D sample points
+%       sampleTriangles = The triangles to which each 3D sample point belongs
 %
 %
 %   Copyright 2019, Max van den Boom
