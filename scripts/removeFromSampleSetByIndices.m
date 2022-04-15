@@ -69,5 +69,8 @@ function [SS] = removeFromSampleSetByIndices(SS, remSampleIndices)
     if isfield(SS, 'preTrans_samplePositions')
         SS.preTrans_samplePositions(remSampleIndices, :) = [];
     end
+    if isfield(SS, 'preTrans_sampleGrids')
+        SS.preTrans_sampleGrids(sampleGridElectrodes, :) = [];
+    end
     
 end

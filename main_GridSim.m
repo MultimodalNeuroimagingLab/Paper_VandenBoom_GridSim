@@ -3,7 +3,8 @@
 %
 
 % limit the number of threads to process data (less threads also means less memory)
-numThreads = 1;
+numClassThreads = 1;
+numCylThreads = 3;
 
 % set the path to the BIDS data directory
 bids_rootPath   = 'Y:\WorkData\BIDS_GridSim';
@@ -68,7 +69,7 @@ gHull = s0_createHull(  bids_rootPath, bids_sub, hemi, [hemi, '.aparc.Ext.annot'
                         { 'superiorfrontal', 'caudalmiddlefrontal', 'parsopercularis', 'precentral', ...
                           'postcentral', 'superiorparietal', 'supramarginal', 'inferiorparietal'  });
 
-% save
+% save hull
 hullFile = [hemi, '_ext_hull__.gii'];
 save(gHull, fullfile(bids_simPath, hullFile))
                           
@@ -88,6 +89,7 @@ save(gHull, fullfile(bids_simPath, hullFile))
 hullPath = fullfile(bids_simPath, [hemi, '_ext_hull.gii']);
 [SS, suffix] = s1_generateSamples(hullPath);
 
+% save results
 samplesFile_s1_out = ['sampleSet-', suffix];
 save(fullfile(bids_simTaskPath, [samplesFile_s1_out, '.mat']), 'SS');
 
@@ -98,9 +100,10 @@ save(fullfile(bids_simTaskPath, [samplesFile_s1_out, '.mat']), 'SS');
 %%
 %  Step 2 - Peform searchlight classification on each of the 3D sample-points with a specific radius
 %
-[SS, suffix]                = s2_searchlight(   SS, bids_rootPath, bids_sub, bids_task, hemi, ...
+[SS, suffix]                = s2_searchlight(   SS, ...
+                                                bids_rootPath, bids_sub, bids_task, hemi, ...
                                                 7, ...                                                      % <-- searchlight radius
-                                                classConfig, numThreads);
+                                                classConfig, numClassThreads);
 
 % save results
 bids_simTaskPath            = fullfile(bids_simPath, bids_task);
@@ -121,7 +124,10 @@ bids_simTaskPath            = fullfile(bids_simPath, bids_task);
 samplesFile_s3_out          = fullfile(bids_simTaskPath, [samplesFile_s2_out, '_', suffix]);
 if ~exist(samplesFile_s3_out, 'dir'),     mkdir(samplesFile_s3_out);    end
 save(fullfile(samplesFile_s3_out, [samplesFile_s2_out, '_', suffix, '.mat']), 'SS');
-%samplesFile_s3_out         = fullfile(bids_simTaskPath, 'sampleSet_HandGesture_search-rad7_P95nofoc');      % <-- for debugging or to pick up after this step (make sure to load the file first)
+
+% \/-- for debugging or to pick up after this step (make sure to load the sample-file first)
+%bids_simTaskPath            = fullfile(bids_simPath, bids_task);
+%samplesFile_s3_out         = fullfile(bids_simTaskPath, 'sampleSet_HandGesture_search-rad7_P95nofoc');
 
 
 
@@ -131,6 +137,20 @@ save(fullfile(samplesFile_s3_out, [samplesFile_s2_out, '_', suffix, '.mat']), 'S
 samplesFiles_s4_out         = s4_projectGrids(  SS, ...
                                                 fullfile(bids_simPath, [hemi, '_ext_hull.gii']), ...
                                                 fullfile(samplesFile_s3_out, [samplesFile_s2_out, '_', suffix, '_proj']));
+
+% \/-- for debugging or to pick up after this step (make sure to load the sample-file first)
+%samplesFiles_s4_out        = dir(fullfile(bids_simTaskPath, 'sampleSet_HandGesture_search-rad7_P95nofoc', 'sampleSet_HandGesture_search-rad7_P95nofoc_proj', '/**/*.mat'));
+%samplesFiles_s4_out        = strcat({samplesFiles_s4_out.folder}, filesep, {samplesFiles_s4_out.name});
+
+
+
+%%
+%  Step 5 - 
+%
+samplesFiles_s5_out         = s5_gridsClassify( samplesFiles_s4_out, ...
+                                                bids_rootPath, bids_sub, bids_task, hemi, ...
+                                                fullfile(bids_simPath, hullFile), ...
+                                                classConfig, numCylThreads, numClassThreads);
 
 
 

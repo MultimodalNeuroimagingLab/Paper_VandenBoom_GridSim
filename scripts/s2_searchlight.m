@@ -30,12 +30,13 @@
 function [SS, filenameSuffix] = s2_searchlight(SS, bids_rootPath, bids_sub, bids_task, hemi, searchLightRadius, classConfig, numThreads)
     if exist('numThreads', 'var') == 0,  numThreads = 0;     end
     
-    searchlightLimit = 20;              % limit on the number of searchlights
-    %searchlightLimit = 200000;              % limit on the number of searchlights
+    searchlightLimit = 200000;              % limit on the number of searchlights
 
+    
     %%
     % retrieve the root path and make sure dependencies can be found
     %
+    
     addpath('../');
     gridSimRoot = gridSimRootPath;
     addpath([gridSimRoot, filesep, 'functions']);
@@ -56,13 +57,13 @@ function [SS, filenameSuffix] = s2_searchlight(SS, bids_rootPath, bids_sub, bids
     bids_func_dataFilepath = fullfile(bids_rootPath, ['sub-' bids_sub], 'func', ['sub-' bids_sub '_task-' bids_task '_bold.nii']);
     bids_func_jsonFilepath = fullfile(bids_rootPath, ['sub-' bids_sub], 'func', ['sub-' bids_sub '_task-' bids_task '_bold.json']);
 
-    % load the grey matter volume (reslices to functional, native space)
+    % load the grey matter volume (resliced to functional, native space)
     gmData = mx.nifti.readVol(bids_gmFilepath);
 
     % load the task volumes, event and JSON file
+    [funcVolData, funcVol]      = mx.nifti.readVol(bids_func_dataFilepath);  funcVol = funcVol(1);
     events                      = readtable(bids_func_eventFilepath, 'FileType', 'text', 'Delimiter', '\t', 'TreatAsEmpty', {'N/A', 'n/a'}, 'ReadVariableNames', true);
     json                        = jsondecode(fileread(bids_func_jsonFilepath));
-    [funcVolData, funcVol]      = mx.nifti.readVol(bids_func_dataFilepath);  funcVol = funcVol(1);
 
     % generate the real-word coordinates for the voxels in the functional images
     [R, C, P] = ndgrid(1:funcVol.dim(1), 1:funcVol.dim(2), 1:funcVol.dim(3));
@@ -74,14 +75,8 @@ function [SS, filenameSuffix] = s2_searchlight(SS, bids_rootPath, bids_sub, bids
     clear RCP;
 
     % check whether the grey matter volume has the same dimensions as the functional data
-    if  size(funcVolData, 1) ~= size(gmData, 1) || ...
-        size(funcVolData, 2) ~= size(gmData, 2) || ...
-        size(funcVolData, 3) ~= size(gmData, 3)
-
-        % message and return
-        fprintf(2, 'Error: the grey matter volume and functional volume data dimensions mismatch\n');
-        return;
-
+    if  size(funcVolData, 1) ~= size(gmData, 1) || size(funcVolData, 2) ~= size(gmData, 2) || size(funcVolData, 3) ~= size(gmData, 3)
+        error('Error: the grey matter volume and functional volume data dimensions mismatch');
     end
 
     % NaN out the non-grey-matter values in the functional data
@@ -93,9 +88,9 @@ function [SS, filenameSuffix] = s2_searchlight(SS, bids_rootPath, bids_sub, bids
 
 
     %%
-    %  Tranform everything related to pial space (pial, hull and samplepoints) to match the "MRI/NIFTI" space
-    %  the freesurfer pial (surface) and the mgz/nii have a slight spatial difference.
-    %  In the header of each mgz there is information to correct for this
+    %  Tranform everything related in freesurfer space (samplepoints) to match the "MRI/NIFTI" space
+    %  Note: the freesurfer pial (surface) and the mgz/nii have a slight spatial difference, in the 
+    %        header of each mgz there is information to correct for this
     %
 
     % load the orig.mgz header information and calculate the transformation matrix to bring it back to native space
@@ -176,7 +171,6 @@ function [SS, filenameSuffix] = s2_searchlight(SS, bids_rootPath, bids_sub, bids
     %  Limit the number of grids. The classification of each grid takes a lot of time
     %  so apply an upper cap on the number of grids/classifications
     %
-
     if searchlightLimit ~= 0 && size(SS.samplePositions, 1) > searchlightLimit
 
         % remove the samples
@@ -309,11 +303,10 @@ function [SS, filenameSuffix] = s2_searchlight(SS, bids_rootPath, bids_sub, bids
 
 
     %%
-    %  Undo the transformation to match the "MRI/NIFTI" space of the samplepoints (so it matches the original FS pial again)
-    %  do the same for the pial and hull in memory that have also been transformed before
+    %  Undo the transformation of the samplepoint from before (to "MRI/NIFTI" space from freesurfer space)
     %
 
-    % check if the sampleset positions have not yet been corrected (translated)
+    % check if the sampleset positions have been corrected (translated)
     if isfield(SS, 'transformedToNiftiSpace') == 1 && ~isempty(SS.transformedToNiftiSpace)
         % corrected
 

@@ -102,7 +102,6 @@ function outputFiles = s4_projectGrids(SS, hullPath, projectionsOutputDir)
     % project the grid for each grid configuration on the sample-set points
     %
 
-    %
     outputFiles = {};
     
     % loop through the different grid configurations
@@ -253,9 +252,6 @@ function outputFiles = s4_projectGrids(SS, hullPath, projectionsOutputDir)
         X = X - gridHSizeWithoutElec / 2;
         Y = Y - gridVSizeWithoutElec / 2;
         sampleGridLocal = [X(:), Y(:)];
-
-        % debug, plot the grid
-        %plot(X, Y, '*r');
 
         % reset timer
         tic
