@@ -17,6 +17,8 @@ hemi            = 'lh';
 % output path for the simulations
 bids_simPath = fullfile(bids_rootPath, 'derivatives', [hemi, '_simulations'], ['sub-' bids_sub]);
 if ~exist(bids_simPath, 'dir'),     mkdir(bids_simPath);    end
+bids_simTaskPath            = fullfile(bids_simPath, bids_task);
+if ~exist(bids_simTaskPath, 'dir'),     mkdir(bids_simTaskPath);    end
 
 % In order to reproduce the results in the article we start at step 2, and
 % set the samples filename to the previously generated sample-set
@@ -106,8 +108,6 @@ save(fullfile(bids_simTaskPath, [samplesFile_s1_out, '.mat']), 'SS');
                                                 classConfig, numClassThreads);
 
 % save results
-bids_simTaskPath            = fullfile(bids_simPath, bids_task);
-if ~exist(bids_simTaskPath, 'dir'),     mkdir(bids_simTaskPath);    end
 samplesFile_s2_out          = [samplesFile_s1_out, '_', bids_task, '_', suffix];
 save(fullfile(bids_simTaskPath, [samplesFile_s2_out, '.mat']), 'SS');
 %samplesFile_s2_out         = 'sampleSet_HandGesture_search-rad7';                                          % <-- for debugging or to pick up after this step (make sure to load the file first)
@@ -120,14 +120,10 @@ save(fullfile(bids_simTaskPath, [samplesFile_s2_out, '.mat']), 'SS');
 [SS, suffix]                = s3_sampleSelection(SS);
 
 % save results
-bids_simTaskPath            = fullfile(bids_simPath, bids_task);
 samplesFile_s3_out          = fullfile(bids_simTaskPath, [samplesFile_s2_out, '_', suffix]);
 if ~exist(samplesFile_s3_out, 'dir'),     mkdir(samplesFile_s3_out);    end
 save(fullfile(samplesFile_s3_out, [samplesFile_s2_out, '_', suffix, '.mat']), 'SS');
-
-% \/-- for debugging or to pick up after this step (make sure to load the sample-file first)
-%bids_simTaskPath            = fullfile(bids_simPath, bids_task);
-%samplesFile_s3_out         = fullfile(bids_simTaskPath, 'sampleSet_HandGesture_search-rad7_P95nofoc');
+%samplesFile_s3_out         = fullfile(bids_simTaskPath, 'sampleSet_HandGesture_search-rad7_P95nofoc');   % <-- for debugging or to pick up after this step (make sure to load the sample-file first)
 
 
 
